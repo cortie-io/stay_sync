@@ -1,0 +1,22 @@
+# dependencies / build output
+node_modules/
+.next/
+dist/
+.venv/
+__pycache__/
+*.pyc
+
+# secrets — never commit env files
+.env
+.env.*
+
+# logs / OS
+*.log
+.DS_Store
+
+# large media / design sources (not source code)
+*.zip
+*.mp4
+*.mov
+*.webm
+*.pptx

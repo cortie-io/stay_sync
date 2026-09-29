@@ -1,0 +1,456 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TravelSession {
+  // ==========================================================
+  // Primary Key
+  // ==========================================================
+
+  id Int @id @default(autoincrement())
+
+  /// 사용자 세션 ID
+  sessionId String @unique
+
+  // ==========================================================
+  // Conversation State
+  // ==========================================================
+
+  /// 현재 진행 단계
+  currentStep String
+
+  /// Route 번호
+  routeNumber Int @default(1)
+
+  /// 마지막 질문한 Fact
+  lastQuestionField String?
+
+  /// 수정 대상
+  correctionTarget String?
+
+  /// 초기화 대상 Fact
+  rollbackFields String?
+
+  // ==========================================================
+  // User Information
+  // ==========================================================
+
+  /**
+   * 사용자 언어
+   * ko
+   * en
+   * ja
+   * zh
+   */
+  language String @default("ko")
+
+  /// ACCOMMODATION | ATTRACTION | ROUTE_ONLY
+  serviceType String?
+
+  // ==========================================================
+  // Travel Facts
+  // ==========================================================
+
+  /// 여행 지역
+  region String?
+
+  /// 여행 기간 (예: 2박3일)
+  period String?
+
+  /// 출발일
+  startDate DateTime?
+
+  /// 종료일
+  endDate DateTime?
+
+  /**
+   * 숙박
+   * 당일치기
+   */
+  tripType String?
+
+  // ==========================================================
+  // Accommodation
+  // ==========================================================
+
+  accommodationName String?
+
+  accommodationAddress String?
+
+  accommodationMapx Float?
+
+  accommodationMapy Float?
+
+  // ==========================================================
+  // Departure Location (당일치기)
+  // ==========================================================
+
+  departureName String?
+
+  departureAddress String?
+
+  departureMapx Float?
+
+  departureMapy Float?
+
+  // ==========================================================
+  // Companion
+  // ==========================================================
+
+  companionType String?
+
+  // ==========================================================
+  // Ontology Mapping Result
+  // ==========================================================
+
+  /**
+   * 예)
+   * ["자연","힐링","카페"]
+   */
+  themes Json?
+
+  // ==========================================================
+  // Recommendation
+  // ==========================================================
+
+  /**
+   * 사용자가 선택한 관광지
+   */
+  selectedPlaces Json?
+
+  /**
+   * 추가 추천 관광지
+   */
+  relatedPlaces Json?
+
+  /**
+   * 추천 반복 횟수
+   */
+  recommendationRound Int @default(1)
+
+  // ==========================================================
+  // Route Planning
+  // ==========================================================
+
+  /**
+   * 최종 선택 관광지
+   */
+  finalSelectedPlaces Json?
+
+  /**
+   * 최종 동선
+   * 출발지(숙소 또는 당일치기 출발지)
+   * →
+   * 관광지...
+   * →
+   * 출발지 복귀
+   */
+  finalRoute Json?
+
+  // ==========================================================
+  // Kakao Map
+  // ==========================================================
+
+  /**
+   * 카카오맵 저장 여부
+   */
+  kakaoMapSaved Boolean @default(false)
+
+  // ==========================================================
+  // Session Status
+  // ==========================================================
+
+  /**
+   * 여행 추천 완료 여부
+   */
+  isCompleted Boolean @default(false)
+
+  // ==========================================================
+  // Future Extension
+  // ==========================================================
+
+  /**
+   * 확장용 JSON
+   * (향후 새로운 Fact나 옵션 저장)
+   */
+  facts Json?
+
+  // ==========================================================
+  // Timestamp
+  // ==========================================================
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model WeatherForecast {
+  // ==========================================================
+  // Primary Key
+  // ==========================================================
+
+  id Int @id @default(autoincrement())
+
+  // ==========================================================
+  // Forecast Information
+  // ==========================================================
+
+  /// 예보 날짜
+  date DateTime
+
+  /// 지역명
+  region String
+
+  /// 최저기온
+  minTemp Float?
+
+  /// 최고기온
+  maxTemp Float?
+
+  /// 평균기온
+  avgTemp Float?
+
+  /// 강수확률
+  rainProb Float?
+
+  /**
+   * short : 단기예보
+   * mid   : 중기예보
+   */
+  source String
+
+  // ==========================================================
+  // Timestamp
+  // ==========================================================
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([date, region], name: "date_region")
+}
+
+model Attraction {
+  id Int @id @default(autoincrement())
+
+  /// 한국관광공사 관광 콘텐츠 ID
+  contentId String @unique
+
+  title           String
+  normalizedTitle String
+
+  /**
+   * 영문 관광지명
+   *
+   * 한국관광공사 영문 서비스(EngService2)에 등록된 관광지만 채워진다.
+   * 한국어 서비스와 contentId 체계가 달라 제목으로 맞춘 값이다.
+   */
+  titleEn           String?
+  normalizedTitleEn String?
+
+  region          String
+  address1        String
+  address2        String?
+  zipCode         String?
+
+  mapx     Float?
+  mapy     Float?
+  mapLevel Int?
+
+  areaCode      String?
+  sigunguCode   String?
+  contentTypeId String?
+
+  category1 String?
+  category2 String?
+  category3 String?
+
+  classification1 String?
+  classification2 String?
+  classification3 String?
+
+  firstImage  String?
+  firstImage2 String?
+  telephone   String?
+
+  copyrightDivisionCode    String?
+  sourceCreatedTime        String?
+  sourceModifiedTime       String?
+  legalDistrictRegionCode  String?
+  legalDistrictSigunguCode String?
+
+  /// 추후 데이터 보강 시 indoor 또는 outdoor 저장
+  indoorOutdoor String?
+
+  searchStats AttractionSearchStat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([region])
+  @@index([normalizedTitle])
+  @@index([normalizedTitleEn])
+  @@index([region, indoorOutdoor])
+}
+
+model AttractionSearchStat {
+  id Int @id @default(autoincrement())
+
+  /// 관광지 마스터와 이름이 연결된 경우에만 설정
+  attractionId Int?
+  attraction   Attraction? @relation(fields: [attractionId], references: [id], onDelete: SetNull)
+
+  region         String
+  detailRegion   String?
+  year           Int
+  month          Int
+  yearMonth      DateTime
+  rank           Int
+  placeName      String
+  normalizedName String
+  searchCount    Int
+  middleCategory String
+  smallCategory  String
+  sourceFile     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([attractionId, yearMonth])
+  @@index([region, yearMonth, rank])
+  @@index([region, yearMonth, middleCategory, rank])
+  @@index([normalizedName])
+}
+
+// ==========================================================
+// Logs — 채팅 내역과 동선(여행 경로) 추천 결과를 남긴다.
+// 대화 흐름과 무관한 기록용이라 저장에 실패해도 응답에는 영향을 주지 않는다.
+// ==========================================================
+
+/// 채팅 한 턴(사용자 입력 1건 + 챗봇 응답 1건)
+model ChatLog {
+  id Int @id @default(autoincrement())
+
+  /// 기록을 남긴 사이트 (백엔드 환경변수 SITE_ID, 예: stay-sync / kbu-stay-sync)
+  site String?
+
+  /// 브라우저 탭 단위 대화 세션 ID (TravelSession.sessionId와 같은 값)
+  sessionId String
+
+  /// 요청 추적용 ID (서버 로그의 chat-debug와 같은 값)
+  requestId String?
+
+  /// 사용자가 보낸 원문
+  userMessage String
+
+  /// 지원 언어가 아니어서 번역을 거친 경우 실제로 처리한 입력
+  processedMessage String?
+
+  /// 브라우저 로케일 / 응답 언어
+  locale   String?
+  language String?
+
+  /// 이 턴을 처리한 뒤의 대화 단계
+  stepAfter String?
+
+  /// 사용자에게 보여준 응답과 선택지·추천 카드
+  botReply        String?
+  quickReplies    Json?
+  recommendations Json?
+
+  /// 이 턴 이후 수집된 여행 정보
+  facts Json?
+
+  isError      Boolean @default(false)
+  errorMessage String?
+
+  /// 요청 처리 시간(ms)
+  latencyMs Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId, createdAt])
+  @@index([createdAt])
+  @@index([site, createdAt])
+}
+
+/// 동선(여행 경로) 추천 결과
+model RouteLog {
+  id Int @id @default(autoincrement())
+
+  /// 기록을 남긴 사이트 (백엔드 환경변수 SITE_ID)
+  site String?
+
+  sessionId String
+  requestId String?
+
+  /// 서비스 유형 (숙소 예약 완료 / 관광지 선택 완료 · 동선만 등)
+  serviceType String?
+
+  region        String?
+  period        String?
+  startDate     String?
+  endDate       String?
+  companionType String?
+
+  /// 숙소·출발지 (이름, 주소, 좌표)
+  accommodation Json?
+  departure     Json?
+
+  /// 사용자가 고른 관광지와 일자별 최종 동선
+  selectedPlaces  Json?
+  dailyRoutes     Json
+  kakaoRouteLinks Json?
+
+  /// 사용자에게 보여준 동선 안내 문구
+  reply String?
+
+  facts Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId, createdAt])
+  @@index([createdAt])
+  @@index([site, createdAt])
+}
+
+/// 외부 API(TourAPI·카카오 이미지 검색) 응답 캐시. 하루 호출 한도를 지키고 재배포·여러 사이트 간에 공유한다.
+/// (src/services/externalCache.js)
+model ExternalApiCache {
+  /// 예: "tourapi:detail:12345", "image:name:가평:자라섬"
+  key String @id
+
+  /// { v: 실제 값 } — null 결과도 저장할 수 있도록 감싼다
+  value Json
+
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+}
+
+/// AI 동선 플래너에서 저장·공유한 여행 일정 (kbu 플래너, src/services/plannerService.js)
+model SavedTrip {
+  id Int @id @default(autoincrement())
+
+  /// 공유 링크용 ID (추측하기 어려운 무작위 문자열)
+  shareId String @unique
+
+  /// 저장한 사이트 (SITE_ID)
+  site String?
+
+  sessionId String?
+  title     String
+
+  /// 화면에 그대로 다시 그릴 수 있는 일정 전체 (여행지·날짜·시간표·지도 좌표 등)
+  payload Json
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId, createdAt])
+}

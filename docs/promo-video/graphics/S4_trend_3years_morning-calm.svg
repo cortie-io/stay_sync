@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+<!-- S4: 아침고요수목원 월별 검색량 2023~2025 (출처: stay-sync API /api/attractions/1584/trend). 각 연도 path에 AE Trim Paths 적용 -->
+<rect id="bg" width="1920" height="1080" fill="#ffffff"/>
+<g id="grid" stroke="#ebeae7" stroke-width="1">
+<line x1="180" x2="1800" y1="900.0" y2="900.0"/>
+<line x1="180" x2="1800" y1="740.9" y2="740.9"/>
+<line x1="180" x2="1800" y1="581.8" y2="581.8"/>
+<line x1="180" x2="1800" y1="422.7" y2="422.7"/>
+<line x1="180" x2="1800" y1="263.6" y2="263.6"/>
+</g><g id="month-labels" font-family="Noto Sans KR, sans-serif" font-size="24" fill="#7a7874" text-anchor="middle">
+<text x="180.0" y="950">1월</text>
+<text x="327.3" y="950">2월</text>
+<text x="474.5" y="950">3월</text>
+<text x="621.8" y="950">4월</text>
+<text x="769.1" y="950">5월</text>
+<text x="916.4" y="950">6월</text>
+<text x="1063.6" y="950">7월</text>
+<text x="1210.9" y="950">8월</text>
+<text x="1358.2" y="950">9월</text>
+<text x="1505.5" y="950">10월</text>
+<text x="1652.7" y="950">11월</text>
+<text x="1800.0" y="950">12월</text>
+</g>
+<g id="year-2023"><path id="line-2023" d="M180.0,726.3 L327.3,700.9 L474.5,674.6 L621.8,397.3 L769.1,431.6 L916.4,501.1 L1063.6,726.9 L1210.9,692.3 L1358.2,608.9 L1505.5,263.6 L1652.7,635.4 L1800.0,596.8" fill="none" stroke="#c9c7c2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="180.0" cy="726.3" r="6" fill="#c9c7c2"/>
+<circle cx="327.3" cy="700.9" r="6" fill="#c9c7c2"/>
+<circle cx="474.5" cy="674.6" r="6" fill="#c9c7c2"/>
+<circle cx="621.8" cy="397.3" r="6" fill="#c9c7c2"/>
+<circle cx="769.1" cy="431.6" r="6" fill="#c9c7c2"/>
+<circle cx="916.4" cy="501.1" r="6" fill="#c9c7c2"/>
+<circle cx="1063.6" cy="726.9" r="6" fill="#c9c7c2"/>
+<circle cx="1210.9" cy="692.3" r="6" fill="#c9c7c2"/>
+<circle cx="1358.2" cy="608.9" r="6" fill="#c9c7c2"/>
+<circle cx="1505.5" cy="263.6" r="6" fill="#c9c7c2"/>
+<circle cx="1652.7" cy="635.4" r="6" fill="#c9c7c2"/>
+<circle cx="1800.0" cy="596.8" r="6" fill="#c9c7c2"/>
+<text x="1820.0" y="604.8" font-family="Noto Serif KR, serif" font-size="30" fill="#c9c7c2">2023</text></g>
+<g id="year-2024"><path id="line-2024" d="M180.0,714.4 L327.3,727.4 L474.5,698.0 L621.8,437.7 L769.1,388.2 L916.4,532.9 L1063.6,730.8 L1210.9,740.8 L1358.2,679.8 L1505.5,397.0 L1652.7,478.8 L1800.0,675.2" fill="none" stroke="#8fb5a4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="180.0" cy="714.4" r="6" fill="#8fb5a4"/>
+<circle cx="327.3" cy="727.4" r="6" fill="#8fb5a4"/>
+<circle cx="474.5" cy="698.0" r="6" fill="#8fb5a4"/>
+<circle cx="621.8" cy="437.7" r="6" fill="#8fb5a4"/>
+<circle cx="769.1" cy="388.2" r="6" fill="#8fb5a4"/>
+<circle cx="916.4" cy="532.9" r="6" fill="#8fb5a4"/>
+<circle cx="1063.6" cy="730.8" r="6" fill="#8fb5a4"/>
+<circle cx="1210.9" cy="740.8" r="6" fill="#8fb5a4"/>
+<circle cx="1358.2" cy="679.8" r="6" fill="#8fb5a4"/>
+<circle cx="1505.5" cy="397.0" r="6" fill="#8fb5a4"/>
+<circle cx="1652.7" cy="478.8" r="6" fill="#8fb5a4"/>
+<circle cx="1800.0" cy="675.2" r="6" fill="#8fb5a4"/>
+<text x="1820.0" y="683.2" font-family="Noto Serif KR, serif" font-size="30" fill="#8fb5a4">2024</text></g>
+<g id="year-2025"><path id="line-2025" d="M180.0,741.3 L327.3,786.9 L474.5,739.5 L621.8,538.4 L769.1,306.4 L916.4,509.0 L1063.6,783.8 L1210.9,741.9 L1358.2,744.8 L1505.5,315.0 L1652.7,487.1 L1800.0,731.4" fill="none" stroke="#4e6e61" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="180.0" cy="741.3" r="8" fill="#4e6e61"/>
+<circle cx="327.3" cy="786.9" r="8" fill="#4e6e61"/>
+<circle cx="474.5" cy="739.5" r="8" fill="#4e6e61"/>
+<circle cx="621.8" cy="538.4" r="8" fill="#4e6e61"/>
+<circle cx="769.1" cy="306.4" r="8" fill="#4e6e61"/>
+<circle cx="916.4" cy="509.0" r="8" fill="#4e6e61"/>
+<circle cx="1063.6" cy="783.8" r="8" fill="#4e6e61"/>
+<circle cx="1210.9" cy="741.9" r="8" fill="#4e6e61"/>
+<circle cx="1358.2" cy="744.8" r="8" fill="#4e6e61"/>
+<circle cx="1505.5" cy="315.0" r="8" fill="#4e6e61"/>
+<circle cx="1652.7" cy="487.1" r="8" fill="#4e6e61"/>
+<circle cx="1800.0" cy="731.4" r="8" fill="#4e6e61"/>
+<text x="1820.0" y="739.4" font-family="Noto Serif KR, serif" font-size="30" fill="#4e6e61">2025</text></g>
+<text id="title" x="180" y="120" font-family="Noto Serif KR, serif" font-size="52" fill="#34322f">아침고요수목원 · 월별 검색량 3개년</text>
+</svg>

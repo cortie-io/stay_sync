@@ -1,0 +1,237 @@
+const { CURRENT_STEP, ROUTE_NUMBER, SERVICE_TYPE } = require("../data/constants");
+const { decidePostBookingStep } = require("./postBookingService");
+const { t } = require("./messageService");
+const {
+    searchLocation: searchKakaoLocation,
+} = require("./kakaoLocationService");
+
+/**
+ * ==========================================================
+ * Location Input Service
+ * ==========================================================
+ *
+ * 역할
+ * - 숙소 입력
+ * - 출발지 입력
+ * - Kakao Local API 위치 검색
+ * ==========================================================
+ */
+
+/**
+ * 위치 검색
+ */
+async function searchLocation(keyword, options = {}) {
+    return await searchKakaoLocation({
+        keyword,
+        region: options.region,
+        categoryGroupCode: options.categoryGroupCode,
+    });
+}
+
+/**
+ * 숙소 검색
+ */
+async function getAccommodationLocation(name, region) {
+    return await searchLocation(name, {
+        region,
+        categoryGroupCode: "AD5",
+    });
+}
+
+/**
+ * 출발지 검색
+ */
+async function getDepartureLocation(name) {
+    // 출발지는 여행 지역 밖에 있을 수 있으므로 지역명을 검색어에 붙이지 않는다.
+    return await searchLocation(name);
+}
+
+function normalizeSelectedLocation(location) {
+    if (!location) return null;
+    const longitude = Number(location.longitude ?? location.mapx);
+    const latitude = Number(location.latitude ?? location.mapy);
+    if (!location.name || !Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+        return null;
+    }
+    return {
+        name: String(location.name),
+        address: String(location.address || ""),
+        longitude,
+        latitude,
+        kakaoPlaceId: location.kakaoPlaceId || null,
+    };
+}
+
+function buildLocationErrorResult({ error, facts, currentStep, field }) {
+    const configurationError = error.code === "KAKAO_KEY_MISSING";
+
+    return {
+        handled: true,
+        facts,
+        route_number: ROUTE_NUMBER.POST_BOOKING,
+        current_step: currentStep,
+        last_question_field: field,
+        reply: configurationError
+            ? "장소 검색 API가 아직 설정되지 않았습니다. 관리자에게 문의해주세요."
+            : "장소 검색 중 오류가 발생했습니다. 잠시 후 다시 입력해주세요.",
+    };
+}
+
+/**
+ * 위치 입력 처리
+ */
+async function handleLocationInput({
+    userMessage,
+    facts,
+    currentStep,
+    selectedLocation,
+}) {
+
+    /**
+     * ===============================
+     * 숙소 입력
+     * ===============================
+     */
+
+    if (currentStep === CURRENT_STEP.ASK_ACCOMMODATION) {
+
+        let location;
+
+        try {
+            location = normalizeSelectedLocation(selectedLocation)
+                || await getAccommodationLocation(userMessage, facts.region);
+        } catch (error) {
+            return buildLocationErrorResult({
+                error,
+                facts,
+                currentStep: CURRENT_STEP.ASK_ACCOMMODATION,
+                field: "accommodation",
+            });
+        }
+
+        if (!location) {
+
+            return {
+                handled: true,
+                facts,
+
+                route_number:
+                    ROUTE_NUMBER.POST_BOOKING,
+
+                current_step:
+                    CURRENT_STEP.ASK_ACCOMMODATION,
+
+                last_question_field:
+                    "accommodation",
+
+                reply:
+                    "숙소를 찾지 못했습니다. 다시 입력해주세요.",
+            };
+        }
+
+        facts.accommodation = {
+            name: location.name,
+            address: location.address,
+            mapx: location.longitude,
+            mapy: location.latitude,
+        };
+
+        facts.start_location = facts.accommodation;
+
+        if (facts.service_type === SERVICE_TYPE.ROUTE_ONLY) {
+            return {
+                handled: true,
+                facts,
+                route_number: ROUTE_NUMBER.ROUTE_PLANNING,
+                current_step: CURRENT_STEP.READY_FOR_ROUTE_PLANNING,
+                last_question_field: null,
+                reply: t("accommodation.confirmed", {}, facts.language),
+            };
+        }
+
+        return { handled: true, facts, ...decidePostBookingStep(facts) };
+    }
+
+    /**
+     * ===============================
+     * 출발지 입력
+     * ===============================
+     */
+
+    if (currentStep === CURRENT_STEP.ASK_START_LOCATION) {
+
+        let location;
+
+        try {
+            location = normalizeSelectedLocation(selectedLocation)
+                || await getDepartureLocation(userMessage);
+        } catch (error) {
+            return buildLocationErrorResult({
+                error,
+                facts,
+                currentStep: CURRENT_STEP.ASK_START_LOCATION,
+                field: "departure_location",
+            });
+        }
+
+        if (!location) {
+
+            return {
+                handled: true,
+                facts,
+
+                route_number:
+                    ROUTE_NUMBER.POST_BOOKING,
+
+                current_step:
+                    CURRENT_STEP.ASK_START_LOCATION,
+
+                last_question_field:
+                    "departure_location",
+
+                reply:
+                    "출발지를 찾을 수 없습니다. 다시 입력해주세요.",
+            };
+        }
+
+        facts.departure_location = {
+            name: location.name,
+            address: location.address,
+            mapx: location.longitude,
+            mapy: location.latitude,
+        };
+
+        facts.start_location =
+            facts.departure_location;
+
+        if (facts.service_type === SERVICE_TYPE.ROUTE_ONLY) {
+            return {
+                handled: true,
+                facts,
+                route_number: ROUTE_NUMBER.ROUTE_PLANNING,
+                current_step: CURRENT_STEP.READY_FOR_ROUTE_PLANNING,
+                last_question_field: null,
+                reply: t("departure.confirmed", {}, facts.language),
+            };
+        }
+
+        return { handled: true, facts, ...decidePostBookingStep(facts) };
+    }
+
+    return {
+        handled: false,
+        facts,
+        current_step: currentStep,
+        route_number: null,
+        last_question_field: null,
+        reply: null,
+    };
+}
+
+module.exports = {
+    searchLocation,
+    getAccommodationLocation,
+    getDepartureLocation,
+    normalizeSelectedLocation,
+    handleLocationInput,
+};

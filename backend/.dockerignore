@@ -1,0 +1,10 @@
+.env
+.env.*
+node_modules
+.next
+dist
+.git
+*.log
+certs/*.key
+route-server/.venv
+route-server/__pycache__

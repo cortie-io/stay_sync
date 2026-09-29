@@ -1,0 +1,36 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "data:import": "node scripts/importAttractionData.js",
+    "data:replace": "node scripts/importAttractionData.js --replace",
+    "data:classify-environment": "node scripts/classifyAttractionEnvironment.js --apply",
+    "route:start": "cd route-server && .venv/bin/uvicorn app:app --host 127.0.0.1 --port 8001",
+    "route:dev": "cd route-server && .venv/bin/uvicorn app:app --host 127.0.0.1 --port 8001 --reload",
+    "data:check-english": "node scripts/checkEnglishTourApi.js",
+    "data:import-english": "node scripts/importEnglishTitles.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "axios": "^1.18.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.7.3",
+    "node-cron": "^4.6.0",
+    "prisma": "^6.19.3",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

@@ -1,0 +1,159 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-serif: var(--font-gowun-batang), 'Noto Serif KR', ui-serif, Georgia, serif;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.22 0.004 60);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.004 60);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.004 60);
+  --primary: oklch(0.22 0.004 60);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.97 0.002 60);
+  --secondary-foreground: oklch(0.22 0.004 60);
+  --muted: oklch(0.97 0.002 60);
+  --muted-foreground: oklch(0.54 0.005 60);
+  --accent: oklch(0.51 0.042 168);
+  --accent-foreground: oklch(1 0 0);
+  --highlight: oklch(0.51 0.042 168);
+  --highlight-foreground: oklch(1 0 0);
+  --destructive: oklch(0.58 0.2 27);
+  --border: oklch(0.91 0.003 60);
+  --input: oklch(0.91 0.003 60);
+  --ring: oklch(0.51 0.042 168);
+  --chart-1: oklch(0.51 0.042 168);
+  --chart-2: oklch(0.22 0.004 60);
+  --chart-3: oklch(0.54 0.005 60);
+  --chart-4: oklch(0.91 0.003 60);
+  --chart-5: oklch(0.97 0.002 60);
+  --radius: 0.25rem;
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.22 0.004 60);
+  --sidebar-primary: oklch(0.22 0.004 60);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.97 0.002 60);
+  --sidebar-accent-foreground: oklch(0.22 0.004 60);
+  --sidebar-border: oklch(0.91 0.003 60);
+  --sidebar-ring: oklch(0.51 0.042 168);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* 페이지·섹션 제목은 중간 굵기.
+     원래(볼드 전)는 400, 볼드 처리 때 700이었는데 너무 두꺼워 줄였다.
+     고운바탕은 400·700 두 굵기만 있어 600을 주면 700으로 떨어지므로, 400에 얇은 외곽선을 둘러 그 사이 굵기를 만든다. */
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    -webkit-text-stroke: 0.016em currentColor;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---- AI 동선 플래너 지도 (Leaflet) ---- */
+.trip-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: var(--foreground);
+  color: var(--background);
+  border: 2px solid var(--background);
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.2);
+  font: 500 11px/1 var(--font-serif);
+}
+
+.trip-marker[data-start='true'] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.trip-marker[data-variant='origin'] {
+  background: var(--background);
+  color: var(--foreground);
+  border: 2px solid var(--foreground);
+  border-radius: 4px;
+}
+
+.leaflet-container {
+  font-family: inherit;
+  background: var(--muted);
+}
+
+.leaflet-tile-pane {
+  filter: grayscale(1) contrast(0.92) brightness(1.06);
+}
+
+.leaflet-tooltip {
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  font-size: 12px;
+  color: var(--foreground);
+}
