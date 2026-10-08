@@ -350,6 +350,7 @@ async function runChat({
             related_places: recommendationResult.recommendations,
             recommended_history: recommendationResult.recommendedHistory,
             recommendation_round: recommendationResult.recommendationRound,
+            recommendation_has_more: recommendationResult.hasMore,
             weather_forecasts: recommendationResult.weatherContext.forecasts,
             weather_filter: recommendationResult.weatherFilter,
             air_quality: recommendationResult.airQualityContext,
@@ -382,14 +383,18 @@ async function runChat({
             related_places: recommendationResult.recommendations,
             recommended_history: recommendationResult.recommendedHistory,
             recommendation_round: nextRound,
+            recommendation_has_more: Boolean(recommendationResult.hasMore),
             weather_forecasts: recommendationResult.weatherContext.forecasts,
             weather_filter: recommendationResult.weatherFilter,
             air_quality: recommendationResult.airQualityContext,
         };
 
         if (recommendationResult.exhausted) {
-            // 하나라도 선택한 상태라면 기존처럼 추천을 마치고 동선을 만든다.
+            // 하나라도 선택한 상태라면, 말없이 동선으로 넘어가지 않고 앞서 보여준 곳 중 안 고른 곳을 다시 보여 준다.
+            // (다 골랐으면 더 보여줄 게 없으니 동선을 만든다)
             if ((recommendationFacts.selected_places || []).length > 0) {
+                const remaining = unpickedPlaces(currentFacts);
+                if (remaining.length > 0) return await reshowRemaining(currentFacts, remaining);
                 return await finalizeRoute(recommendationFacts);
             }
 
@@ -429,6 +434,44 @@ async function runChat({
             exhausted: false,
             situationSummary: recommendationResult.situationSummary,
             situationFilterApplied: Boolean(recommendationResult.weatherFilter),
+        };
+    }
+
+    // 앞서 보여준 추천 중 아직 고르지 않은 곳
+    function unpickedPlaces(currentFacts) {
+        const picked = new Set((currentFacts.selected_places || []).map(({ id }) => String(id)));
+        return (currentFacts.related_places || []).filter(({ id }) => !picked.has(String(id)));
+    }
+
+    // 새로 추천할 곳이 없을 때: 안 고른 곳을 다시 목록으로 보여 주고, 더 고르거나 이대로 동선을 만들게 한다.
+    async function reshowRemaining(currentFacts, remaining) {
+        const language = currentFacts.language || "ko";
+        const reshowFacts = {
+            ...currentFacts,
+            related_places: remaining,
+            recommendation_has_more: false,
+            more_recommendation_mode: null,
+        };
+        await sessionService.saveConversationState({
+            sessionId,
+            facts: reshowFacts,
+            currentStep: CURRENT_STEP.RECOMMENDATION_SHOWN,
+            routeNumber: ROUTE_NUMBER.RECOMMENDATION,
+            lastQuestionField: "selected_places",
+        });
+        const reply = t("recommendation.reshow", {
+            region: regionLabel(currentFacts.region, language),
+            count: remaining.length,
+        }, language);
+        return {
+            reply,
+            currentStep: CURRENT_STEP.RECOMMENDATION_SHOWN,
+            facts: reshowFacts,
+            recommendations: remaining,
+            hasMore: false,
+            exhausted: false,
+            // 채팅 화면은 추천 목록이 있으면 이 문장을 목록 위 안내로 보여 준다
+            situationSummary: reply,
         };
     }
 
@@ -702,6 +745,11 @@ async function runChat({
         });
 
         if (!selectionResult.handled) {
+            // 이미 고른 곳이 있는 상태에서 "이대로 동선 만들기"(또는 그만/아니요) → 바로 동선을 만든다
+            if ((facts.selected_places || []).length > 0
+                && /동선(을|으로)?\s*(만들|짜)|^\s*(아니요|아니오|아뇨|그만|완료|됐어)\s*[.!]?\s*$|build the route/i.test(message)) {
+                return await finalizeRoute(facts);
+            }
             const rolledBack = await rollbackToPreviousSection(facts, session.currentStep);
             if (rolledBack) return rolledBack;
 
@@ -724,6 +772,20 @@ async function runChat({
             selected_places: selectionResult.selectedPlaces,
             last_selected_place_ids: selectionResult.newSelections.map(({ id }) => id),
         };
+        // 남은 추천에 맞춰 묻는다 — next: 다음 추천이 있음 / reshow: 이번 목록이 마지막(안 고른 곳 있음) / none: 다 골랐음
+        const remainingAfterPick = unpickedPlaces(selectionFacts);
+        const moreMode = facts.recommendation_has_more !== false
+            ? "next"
+            : remainingAfterPick.length > 0 ? "reshow" : "none";
+        selectionFacts.more_recommendation_mode = moreMode;
+        const moreQuestion = t(
+            moreMode === "next" ? "selection.askMore" : moreMode === "reshow" ? "selection.lastList" : "selection.allPicked",
+            {
+                region: regionLabel(facts.region, facts.language || "ko"),
+                count: selectionFacts.selected_places.length,
+            },
+            facts.language,
+        );
 
         await sessionService.saveConversationState({
             sessionId,
@@ -734,7 +796,7 @@ async function runChat({
         });
 
         return {
-            reply: selectionResult.reply,
+            reply: `${selectionResult.reply}\n\n${moreQuestion}`,
             currentStep: CURRENT_STEP.ASK_MORE_RECOMMENDATION,
             facts: selectionFacts,
             selectedPlaces: selectionResult.selectedPlaces,
@@ -802,6 +864,15 @@ async function runChat({
             return await finalizeRoute(facts);
         }
 
+        // "네"의 뜻은 방금 한 질문에 따라 다르다
+        if (facts.more_recommendation_mode === "none") {
+            return await finalizeRoute(facts);
+        }
+        if (facts.more_recommendation_mode === "reshow") {
+            const remaining = unpickedPlaces(facts);
+            if (remaining.length > 0) return await reshowRemaining(facts, remaining);
+            return await finalizeRoute(facts);
+        }
         return await showNextRecommendations(facts);
     }
 

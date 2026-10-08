@@ -305,7 +305,7 @@ function toPlacePoint(location, id, fallbackName) {
     return { id, name: String(location.name || fallbackName).slice(0, 80), mapx: Number(location.mapx), mapy: Number(location.mapy) };
 }
 
-async function createItinerary({ attractionIds, days, startDate = null, startLocation = null, accommodation = null, companion = null, dayGroups = null }) {
+async function createItinerary({ attractionIds, days, startDate = null, startLocation = null, accommodation = null, companion = null, dayGroups = null, story: presetStory = null }) {
     const ids = [...new Set((attractionIds || []).map(Number).filter(Number.isInteger))].slice(0, MAX_STOPS);
     const groupIds = Array.isArray(dayGroups)
         ? dayGroups.map((group) => (Array.isArray(group) ? group.map(Number).filter(Number.isInteger) : [])).filter((group) => group.length)
@@ -375,7 +375,8 @@ async function createItinerary({ attractionIds, days, startDate = null, startLoc
         selected_places: selectedPlaces,
         final_selected_places: selectedPlaces,
     };
-    const story = await createTravelStory({ facts, dailyRoutes });
+    // 이미 만들어 둔 이야기(챗봇 결과를 옮길 때)가 있으면 다시 만들지 않는다.
+    const story = presetStory || await createTravelStory({ facts, dailyRoutes });
 
     const resultDays = dailyRoutes.map((route) => {
         // 출발지를 지정하지 않으면 그날 첫 여행지가 출발점이 되고, 경로 결과(stops)에는 빠져 있다.
@@ -618,6 +619,43 @@ async function saveTrip({ sessionId, itinerary }) {
     return { shareId: trip.shareId, title: trip.title, createdAt: trip.createdAt };
 }
 
+/**
+ * 챗봇 대화로 완성한 일정을 공유 일정으로 저장한다(키오스크 결과 QR용).
+ * 브라우저가 보낸 내용이 아니라 DB에 저장된 그 세션의 최종 동선만 쓰므로 위조할 수 없다. 같은 세션은 한 번만 저장한다.
+ */
+const CHAT_COMPANIONS = { 혼자: "혼자", 연인: "연인", 친구: "친구", 가족: "가족", 부모님: "부모님", 아이동반: "아이동반", 단체: "친구" };
+
+async function saveTripFromChat(sessionId) {
+    const id = String(sessionId || "").slice(0, 100);
+    if (!id) throw Object.assign(new Error("대화 정보가 없어요."), { status: 400 });
+    const existing = await prisma.savedTrip.findFirst({ where: { sessionId: id }, orderBy: { createdAt: "desc" } });
+    if (existing && existing.payload?.source === "chat") {
+        return { shareId: existing.shareId, title: existing.title, createdAt: existing.createdAt, reused: true };
+    }
+    const session = await prisma.travelSession.findUnique({ where: { sessionId: id } });
+    const facts = session?.facts || {};
+    const finalRoute = Array.isArray(facts.final_route) ? facts.final_route : session?.finalRoute;
+    if (!session || !Array.isArray(finalRoute) || finalRoute.length === 0) {
+        throw Object.assign(new Error("아직 완성된 일정이 없어요."), { status: 404 });
+    }
+    const dayGroups = finalRoute
+        .map((route) => (route.stops || []).map((stop) => Number(stop.id)).filter(Number.isInteger))
+        .filter((group) => group.length);
+    if (dayGroups.length === 0) throw Object.assign(new Error("일정에 담긴 관광지가 없어요."), { status: 404 });
+    const base = facts.accommodation || facts.start_location || facts.departure_location || null;
+    const itinerary = await createItinerary({
+        attractionIds: dayGroups.flat(),
+        days: dayGroups.length,
+        dayGroups,
+        startDate: facts.start_date || null,
+        startLocation: base,
+        companion: CHAT_COMPANIONS[facts.companion_type] || null,
+        story: typeof facts.final_story === "string" ? facts.final_story : null,
+    });
+    const { facts: _facts, dailyRoutes: _routes, ...clean } = itinerary;
+    return saveTrip({ sessionId: id, itinerary: { ...clean, source: "chat" } });
+}
+
 async function getTrip(shareId) {
     const trip = await prisma.savedTrip.findUnique({ where: { shareId: String(shareId) } });
     if (!trip) return null;
@@ -640,6 +678,7 @@ async function getTrips(shareIds) {
 }
 
 module.exports = {
+    saveTripFromChat,
     listDestinations,
     createItinerary,
     assist,

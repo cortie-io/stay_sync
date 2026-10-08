@@ -8,9 +8,10 @@ import { PlannerHeader } from "./planner-header"
 import { ItineraryView } from "./itinerary-view"
 import { TEMPLATE_STORAGE_KEY } from "./planner-app"
 import { SiteFooter } from "@/components/site-footer"
+import { TripCover } from "./trip-cover"
 
 // 공유 링크로 연 일정 — 그대로 보거나, 내 플래너로 가져와 고칠 수 있다.
-export function SharedTrip({ shareId, itinerary }: { shareId: string; itinerary: Itinerary }) {
+export function SharedTrip({ shareId, itinerary, fromKiosk = false }: { shareId: string; itinerary: Itinerary; fromKiosk?: boolean }) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
 
@@ -60,7 +61,8 @@ export function SharedTrip({ shareId, itinerary }: { shareId: string; itinerary:
     <div className="flex min-h-dvh flex-col bg-background">
       <PlannerHeader />
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-8 lg:px-10">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-sm bg-muted px-4 py-3 text-sm">
+        <TripCover itinerary={itinerary} shareId={shareId} fromKiosk={fromKiosk} onPlanWithThis={planWithThis} />
+        <div className="hidden flex-wrap items-center justify-between gap-3 rounded-sm bg-muted px-4 py-3 text-sm lg:flex">
           <span className="text-muted-foreground">공유받은 여행 일정이에요.</span>
           <div className="flex gap-2">
             <button type="button" onClick={copyLink} className="inline-flex h-9 items-center gap-2 rounded-sm border border-border bg-background px-3 text-[13px]">
@@ -72,7 +74,8 @@ export function SharedTrip({ shareId, itinerary }: { shareId: string; itinerary:
             </button>
           </div>
         </div>
-        <ItineraryView itinerary={itinerary} editable={false} shareId={shareId} />
+        <h2 className="-mb-2 font-serif text-2xl">날짜별 동선</h2>
+        <ItineraryView itinerary={itinerary} editable={false} shareId={shareId} hideHeader hideStory />
       </main>
       <SiteFooter />
     </div>

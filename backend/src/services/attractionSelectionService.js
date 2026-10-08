@@ -53,8 +53,8 @@ function selectAttractions({ userMessage, recommendations = [], selectedPlaces =
         selectedPlaces: mergedSelections,
         newSelections: selections.filter(({ id }) => !selectedPlaces.some((place) => String(place.id) === String(id))),
         reply:
-            `${selectedNames}을(를) 선택했습니다.\n\n`
-            + "관광지를 더 추천받으시겠어요?",
+            // 다음에 무엇을 물을지(더 추천 / 목록에서 더 고르기 / 동선 만들기)는 남은 추천에 따라 chatService가 붙인다.
+            `${selectedNames}을(를) 선택했습니다.`,
     };
 }
 
@@ -67,6 +67,7 @@ function classifyMoreRecommendationFallback(userMessage) {
 
     const negativeKeywords = [
         "아니", "아니요", "ㄴㄴ", "노노", "싫어", "필요없", "괜찮", "됐어", "끝", "완료", "그만",
+        "이대로", "동선만들", "동선짜", "동선으로", "buildtheroute",
     ];
     const exactPositiveAnswers = ["네", "예", "응", "어", "ㅇㅇ", "그래", "좋아"];
     const positiveKeywords = [

@@ -91,6 +91,12 @@ function buildFactsFromSession(session) {
                 ? session.facts.recommended_history
                 : [],
         recommendation_round: session.recommendationRound ?? 1,
+        // 이 지역에 다음 추천이 남았는지, 방금 "더 추천?" 질문을 어떤 뜻으로 했는지(next/reshow/none)
+        recommendation_has_more:
+            typeof session.facts?.recommendation_has_more === "boolean"
+                ? session.facts.recommendation_has_more
+                : null,
+        more_recommendation_mode: session.facts?.more_recommendation_mode ?? null,
         travel_days: session.facts?.travel_days ?? null,
         final_selected_places: session.finalSelectedPlaces ?? [],
         final_route: session.finalRoute ?? null,

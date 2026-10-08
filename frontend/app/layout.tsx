@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Gowun_Batang } from 'next/font/google'
 import './globals.css'
+import { KioskProvider } from '@/lib/kiosk'
 
 // 제목·숫자는 고운바탕(부드러운 세리프), 본문은 프리텐다드(아래 <head>에서 CDN 동적 서브셋으로 불러온다).
 const gowunBatang = Gowun_Batang({
@@ -57,7 +58,7 @@ export default function RootLayout({
         <link rel="stylesheet" href={PRETENDARD_CSS} crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased break-keep">
-        {children}
+        <KioskProvider>{children}</KioskProvider>
       </body>
     </html>
   )

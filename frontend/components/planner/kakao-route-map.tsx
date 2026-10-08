@@ -68,7 +68,7 @@ export function KakaoRouteMap({
                 onClick={() => onSelect(day, l.part)}
                 aria-pressed={l.part === current?.part}
                 className={cn(
-                  "rounded-sm border px-2 py-0.5 text-[11px]",
+                  "rounded-sm border px-2 py-0.5 text-[12px]",
                   l.part === current?.part ? "border-foreground text-foreground" : "border-border text-muted-foreground",
                 )}
               >

@@ -1,4 +1,4 @@
-const { listDestinations, createItinerary, assist, saveTrip, getTrip, getTrips } = require("../services/plannerService");
+const { listDestinations, createItinerary, assist, saveTrip, saveTripFromChat, getTrip, getTrips } = require("../services/plannerService");
 const { saveRouteLog, saveChatLog } = require("../repositories/logRepository");
 
 function sendError(res, error, fallbackMessage, requestId) {
@@ -102,6 +102,14 @@ async function postTrip(req, res) {
     }
 }
 
+async function postTripFromChat(req, res) {
+    try {
+        return res.json({ success: true, data: await saveTripFromChat(req.body?.sessionId) });
+    } catch (error) {
+        return sendError(res, error, "일정을 저장하지 못했어요.");
+    }
+}
+
 async function getTripById(req, res) {
     try {
         const trip = await getTrip(req.params.shareId);
@@ -122,4 +130,5 @@ async function listTrips(req, res) {
     }
 }
 
-module.exports = { getDestinations, postItinerary, postAssist, postTrip, getTripById, listTrips };
+module.exports = {
+    postTripFromChat, getDestinations, postItinerary, postAssist, postTrip, getTripById, listTrips };

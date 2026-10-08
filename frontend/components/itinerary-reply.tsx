@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowUpRight, ChevronDown, Home, Lightbulb } from "lucide-react"
+import { ArrowUpRight, ChevronDown, Home, Lightbulb, QrCode } from "lucide-react"
 import type { ChatPlan, ChatRoute, KakaoRouteLink } from "@/lib/concierge-chat"
 import { cn } from "@/lib/utils"
 
@@ -17,10 +17,10 @@ function km(value?: number | null) {
   return value == null || !Number.isFinite(Number(value)) ? null : `${Math.round(Number(value) * 10) / 10}km`
 }
 
-type ParsedStory = { headline: string | null; intro: string; days: Map<number, string>; tips: string | null }
+export type ParsedStory = { headline: string | null; intro: string; days: Map<number, string>; tips: string | null }
 
 // 여행 이야기(글)를 제목 · 소개 · 날짜별 이야기 · 준비 팁으로 나눈다. 형식이 다르면 null.
-function parseStory(story: string | null): ParsedStory | null {
+export function parseStory(story: string | null): ParsedStory | null {
   if (!story) return null
   const lines = story.split("\n").map((line) => line.trim())
   const dayHeader = /^(?:(\d+)\s*일\s*차|day\s*(\d+))(?=\s|\(|:|$)/i
@@ -79,12 +79,12 @@ function DayRoute({ route }: { route: ChatRoute }) {
               <span className="flex w-6 justify-center" aria-hidden>
                 <span className="h-5 w-px bg-border" />
               </span>
-              {item.km && <span className="text-[11px] tabular-nums text-muted-foreground">{item.km}</span>}
+              {item.km && <span className="text-[12px] tabular-nums text-muted-foreground">{item.km}</span>}
             </div>
           )}
           <div className="flex items-center gap-3">
             {item.kind === "stop" ? (
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent font-serif text-[11px] text-accent-foreground">
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent font-serif text-[12px] text-accent-foreground">
                 {item.order}
               </span>
             ) : (
@@ -110,7 +110,7 @@ function DayStory({ text }: { text: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex w-fit items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+        className="inline-flex w-fit items-center gap-1 text-[12px] text-muted-foreground transition-colors hover:text-foreground"
       >
         {open ? "접기" : "이야기 더 보기"}
         <ChevronDown className={cn("size-3 transition-transform", open && "rotate-180")} aria-hidden />
@@ -120,7 +120,7 @@ function DayStory({ text }: { text: string }) {
 }
 
 // 챗봇의 최종 여행 일정 답변 — 긴 글 대신 제목 · 날짜별 동선 · 이야기 · 팁으로 나눠 보여준다.
-export function ItineraryReply({ plan, links }: { plan: ChatPlan; links?: KakaoRouteLink[] | null }) {
+export function ItineraryReply({ plan, links, onShowQr }: { plan: ChatPlan; links?: KakaoRouteLink[] | null; onShowQr?: () => void }) {
   const parsed = parseStory(plan.story)
   const totalKm = plan.routes.reduce((sum, route) => sum + Number(route.totalDistanceKm || 0), 0)
   const period = plan.routes.length > 1 ? `${plan.routes.length - 1}박 ${plan.routes.length}일` : "당일치기"
@@ -129,14 +129,24 @@ export function ItineraryReply({ plan, links }: { plan: ChatPlan; links?: KakaoR
   return (
     <section className="overflow-hidden border border-border bg-background">
       <header className="flex flex-col gap-2 bg-muted/50 px-4 py-4">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-accent">
+        <p className="text-[11px] uppercase tracking-[0.04em] text-accent">
           {["Your Trip", plan.region, period].filter(Boolean).join(" · ")}
         </p>
         <h3 className="font-serif text-lg leading-snug">{parsed?.headline || `${plan.region ?? ""} ${period} 여행 일정`.trim()}</h3>
         {parsed?.intro && <p className="text-[13px] leading-relaxed text-muted-foreground">{parsed.intro}</p>}
-        <p className="text-[11px] tabular-nums text-muted-foreground">
+        <p className="text-[12px] tabular-nums text-muted-foreground">
           {`${plan.routes.reduce((sum, route) => sum + route.stops.length, 0)}곳 · 총 이동 ${km(totalKm) ?? "-"}`}
         </p>
+        {onShowQr && (
+          <button
+            type="button"
+            onClick={onShowQr}
+            className="mt-1 inline-flex w-fit items-center gap-1.5 bg-primary px-3 py-2 text-xs text-primary-foreground transition-opacity hover:opacity-85"
+          >
+            <QrCode className="size-3.5" aria-hidden />
+            결과 크게 보기 · QR
+          </button>
+        )}
       </header>
 
       {plan.routes.map((route) => {
@@ -146,10 +156,10 @@ export function ItineraryReply({ plan, links }: { plan: ChatPlan; links?: KakaoR
           <div key={route.day} className="flex flex-col gap-3 border-t border-border px-4 py-4">
             <div className="flex items-baseline justify-between gap-3">
               <p className="flex items-baseline gap-2">
-                <span className="text-[10px] uppercase tracking-[0.28em] text-accent">{`Day ${route.day}`}</span>
+                <span className="text-[11px] uppercase tracking-[0.28em] text-accent">{`Day ${route.day}`}</span>
                 {formatDay(route.date) && <span className="font-serif text-[15px]">{formatDay(route.date)}</span>}
               </p>
-              {km(route.totalDistanceKm) && <span className="text-[11px] tabular-nums text-muted-foreground">{km(route.totalDistanceKm)}</span>}
+              {km(route.totalDistanceKm) && <span className="text-[12px] tabular-nums text-muted-foreground">{km(route.totalDistanceKm)}</span>}
             </div>
             <DayRoute route={route} />
             {story && <DayStory text={story} />}
@@ -177,7 +187,7 @@ export function ItineraryReply({ plan, links }: { plan: ChatPlan; links?: KakaoR
         <div className="flex gap-3 border-t border-border bg-accent/5 px-4 py-4">
           <Lightbulb className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
           <div className="flex flex-col gap-1">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-accent">여행 준비 팁</p>
+            <p className="text-[11px] uppercase tracking-[0.04em] text-accent">여행 준비 팁</p>
             <p className="text-[13px] leading-relaxed text-foreground/80">{parsed.tips}</p>
           </div>
         </div>
@@ -187,7 +197,7 @@ export function ItineraryReply({ plan, links }: { plan: ChatPlan; links?: KakaoR
       {!parsed && plan.story && (
         <div className="flex flex-col gap-1.5 border-t border-border px-4 py-4">
           <p className={cn("whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/80", !showFullStory && "line-clamp-4")}>{plan.story}</p>
-          <button type="button" onClick={() => setShowFullStory((v) => !v)} className="w-fit text-[11px] text-muted-foreground hover:text-foreground">
+          <button type="button" onClick={() => setShowFullStory((v) => !v)} className="w-fit text-[12px] text-muted-foreground hover:text-foreground">
             {showFullStory ? "접기" : "여행 이야기 더 보기"}
           </button>
         </div>

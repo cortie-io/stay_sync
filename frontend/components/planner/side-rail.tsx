@@ -18,10 +18,10 @@ export function SideRail({
       aria-label="내가 고른 여행지"
       className="hidden w-20 shrink-0 flex-col items-center gap-4 border-r border-border bg-sidebar py-6 md:flex"
     >
-      <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Picks</p>
+      <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Picks</p>
       <ul className="flex flex-1 flex-col items-center gap-4 overflow-y-auto px-2 pb-2">
         {selected.length === 0 && (
-          <li className="text-center text-[11px] leading-relaxed text-muted-foreground">선택 없음</li>
+          <li className="text-center text-[12px] leading-relaxed text-muted-foreground">선택 없음</li>
         )}
         {selected.map((d, i) => (
           <li key={d.id} className="flex flex-col items-center gap-1.5">
@@ -48,7 +48,7 @@ export function SideRail({
             >
               <X className="size-2.5" strokeWidth={2} aria-hidden />
             </button>
-            <span className="font-serif text-[11px] tabular-nums text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+            <span className="font-serif text-[12px] tabular-nums text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
           </li>
         ))}
       </ul>

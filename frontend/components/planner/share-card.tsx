@@ -5,7 +5,7 @@ import { Check, Copy, Download, Link2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
 // 공유 링크 + QR — 휴대폰 카메라로 찍으면 같은 일정이 바로 열린다. QR은 브라우저에서 바로 그린다(외부 서비스 없음).
-function useShareQr(url: string, title: string) {
+export function useShareQr(url: string, title: string) {
   const [svg, setSvg] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
@@ -49,7 +49,7 @@ export function ShareCard({ url, title }: { url: string; title: string }) {
       />
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] uppercase tracking-[0.28em] text-accent">Share</span>
+          <span className="text-[11px] uppercase tracking-[0.28em] text-accent">Share</span>
           <p className="font-serif text-lg">휴대폰으로 찍어 바로 열어 보세요</p>
           <p className="text-xs text-muted-foreground">QR을 찍거나 링크를 보내면 누구나 같은 일정을 볼 수 있어요.</p>
         </div>
@@ -81,7 +81,7 @@ export function ShareCard({ url, title }: { url: string; title: string }) {
 }
 
 // 저장 직후 뜨는 공유 팝업 — 위에 QR, 아래에 링크.
-export function ShareDialog({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
+export function ShareDialog({ url, title, onClose, heading = "일정을 저장했어요" }: { url: string; title: string; onClose: () => void; heading?: string }) {
   const { svg, copied, copy, download } = useShareQr(url, title)
   const closeRef = useRef<HTMLButtonElement>(null)
 
@@ -118,9 +118,9 @@ export function ShareDialog({ url, title, onClose }: { url: string; title: strin
           <X className="size-4" aria-hidden />
         </button>
         <div className="flex flex-col items-center gap-1 text-center">
-          <span className="text-[10px] uppercase tracking-[0.28em] text-accent">Saved</span>
+          <span className="text-[11px] uppercase tracking-[0.28em] text-accent">Saved</span>
           <h2 id="share-dialog-title" className="font-serif text-xl">
-            일정을 저장했어요
+            {heading}
           </h2>
           <p className="text-xs text-muted-foreground">휴대폰 카메라로 QR을 찍으면 같은 일정이 바로 열려요.</p>
         </div>

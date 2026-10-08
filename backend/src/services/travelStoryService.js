@@ -139,7 +139,14 @@ function buildKoreanDayStory(route, descriptions) {
             ? `이후 ${withJosa(remainingNames[0], "으로", "로")} 이동합니다.`
         : "한 장소에 집중할 수 있도록 여유 있게 구성했습니다.";
     const details = stops
-        .map(({ name }) => descriptions.get(name) ? `${name}에서는 ${descriptions.get(name)}` : null)
+        .map(({ name }) => {
+            // 소개글이 이미 장소 이름으로 시작하는 문장이면 그대로, 아니면 "OO은/는 …" 으로 자연스럽게 잇는다
+            const description = descriptions.get(name);
+            if (!description) return null;
+            const sentence = /[.!?…]$/.test(description) ? description : `${description}.`;
+            const mentionsName = sentence.replace(/\s+/g, "").includes(String(name).replace(/\s+/g, ""));
+            return mentionsName ? sentence : `${withJosa(name, "은", "는")} ${sentence}`;
+        })
         .filter(Boolean)
         .slice(0, 2)
         .join(" ");

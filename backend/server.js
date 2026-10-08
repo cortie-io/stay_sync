@@ -17,7 +17,10 @@ const {
 
 const app = express();
 
-app.use(cors());
+// 화면과 API가 같은 주소(/api/)라 다른 사이트에서 부를 일이 없다 — 허용 주소만(쉼표로 여러 개: CORS_ORIGINS)
+const corsOrigins = (process.env.CORS_ORIGINS || "").split(",").map((o) => o.trim()).filter(Boolean);
+if (process.env.NODE_ENV !== "production") corsOrigins.push("http://localhost:5173", "http://localhost:3000");
+app.use(cors({ origin: corsOrigins }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

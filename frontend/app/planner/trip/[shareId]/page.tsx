@@ -18,9 +18,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export default async function SharedTripPage({ params }: { params: Params }) {
+export default async function SharedTripPage({ params, searchParams }: { params: Params; searchParams: Promise<{ from?: string }> }) {
   const { shareId } = await params
+  const { from } = await searchParams
   const trip = await fetchTrip(shareId).catch(() => null)
   if (!trip) notFound()
-  return <SharedTrip shareId={trip.shareId} itinerary={trip.itinerary} />
+  return <SharedTrip shareId={trip.shareId} itinerary={trip.itinerary} fromKiosk={from === "kiosk"} />
 }

@@ -29,7 +29,7 @@ export function SavedTrips() {
       <PlannerHeader />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-5 py-10 lg:px-10">
         <div className="flex flex-col gap-2">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">Saved Trips</p>
+          <p className="text-[12px] uppercase tracking-[0.28em] text-muted-foreground">Saved Trips</p>
           <h1 className="font-serif text-3xl">저장한 여행</h1>
           <p className="text-sm text-muted-foreground">이 브라우저에서 저장한 일정이에요. 링크를 공유하면 누구나 같은 일정을 볼 수 있어요.</p>
         </div>

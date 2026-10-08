@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
+import { cn, koTracking } from "@/lib/utils"
 
 export function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn("text-xs uppercase tracking-[0.3em] text-muted-foreground", className)}>{children}</p>
+  return <p className={cn("text-xs uppercase tracking-[0.3em] text-muted-foreground", koTracking(children), className)}>{children}</p>
 }
 
 export function SectionHeading({

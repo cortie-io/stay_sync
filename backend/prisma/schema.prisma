@@ -372,7 +372,7 @@ model ChatLog {
   /// 요청 처리 시간(ms)
   latencyMs Int?
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([sessionId, createdAt])
   @@index([createdAt])
@@ -412,7 +412,7 @@ model RouteLog {
 
   facts Json?
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([sessionId, createdAt])
   @@index([createdAt])
@@ -428,8 +428,8 @@ model ExternalApiCache {
   /// { v: 실제 값 } — null 결과도 저장할 수 있도록 감싼다
   value Json
 
-  expiresAt DateTime
-  updatedAt DateTime @updatedAt
+  expiresAt DateTime @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   @@index([expiresAt])
 }
@@ -450,7 +450,7 @@ model SavedTrip {
   /// 화면에 그대로 다시 그릴 수 있는 일정 전체 (여행지·날짜·시간표·지도 좌표 등)
   payload Json
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([sessionId, createdAt])
 }

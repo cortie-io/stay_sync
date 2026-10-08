@@ -90,6 +90,10 @@ module.exports = {
     "recommendation.last": "These are the last attractions matching your conditions. Pick the ones you like.",
     "recommendation.exhausted": "There are no more attractions matching this region and theme.",
     "selection.undone": "I removed what you picked last. Please choose again from the list.",
+    "selection.askMore": "Would you like more recommendations?",
+    "selection.lastList": "That was the last list of attractions I can recommend in {region}. Would you like to pick more from it, or shall I build the route now?",
+    "selection.allPicked": "You picked every attraction I can recommend in {region}. Shall I build the route with these {count} places?",
+    "recommendation.reshow": "There are no new attractions to recommend in {region}. Here are the {count} places from before that you haven't picked yet. Pick more, or tap ‘Build the route now’ if you're done.",
     "selection.askMoreUnclear": "Would you like more recommendations, or shall we finish choosing?",
     "selection.readyForRoute": "{reply}\n\nLet me prepare the best route for what you picked.",
 

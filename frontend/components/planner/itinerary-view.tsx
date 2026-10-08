@@ -42,7 +42,7 @@ function WeatherChip({ day }: { day: ItineraryDay }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px]",
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px]",
         w.indoorRecommended ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground",
       )}
       title={w.indoorRecommended ? `${w.reasons.join("·")} 예보 — 실내 여행지를 섞어 보세요` : undefined}
@@ -56,7 +56,7 @@ function WeatherChip({ day }: { day: ItineraryDay }) {
 
 function Connector({ children, icon: Icon = Car }: { children: React.ReactNode; icon?: typeof Car }) {
   return (
-    <li className="flex items-center gap-3 py-2 pl-[4.25rem] text-[11px] text-muted-foreground">
+    <li className="flex items-center gap-3 py-2 pl-[4.25rem] text-[12px] text-muted-foreground">
       <span className="-ml-[1.7rem] flex size-5 items-center justify-center rounded-full bg-muted">
         <Icon className="size-3" aria-hidden />
       </span>
@@ -92,7 +92,7 @@ function StopRow({
         {showTimes && stop.arrive ? stop.arrive : ""}
       </span>
       <span
-        className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full font-serif text-[11px] text-white"
+        className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full font-serif text-[12px] text-white"
         style={{ background: color }}
       >
         {index + 1}
@@ -103,10 +103,10 @@ function StopRow({
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate font-serif text-[15px]">{stop.name}</span>
-          <span className="truncate text-[11px] text-muted-foreground">
+          <span className="truncate text-[12px] text-muted-foreground">
             {[stop.tag, stop.indoorOutdoor].filter(Boolean).join(" · ")}
           </span>
-          <span className="text-[11px] text-muted-foreground">
+          <span className="text-[12px] text-muted-foreground">
             {showTimes && stop.arrive && stop.depart
               ? `${stop.arrive}–${stop.depart} · 약 ${formatMinutes(stop.stayMinutes)} 머무름`
               : `약 ${formatMinutes(stop.stayMinutes ?? 90)} 머무름`}
@@ -123,7 +123,7 @@ function StopRow({
               <X className="size-4" aria-hidden />
             </button>
             {dayCount > 1 && (
-              <label className="text-[11px] text-muted-foreground">
+              <label className="text-[12px] text-muted-foreground">
                 <span className="sr-only">다른 날로 옮기기</span>
                 <select
                   value={dayIndex}
@@ -153,6 +153,9 @@ export function ItineraryView({
   saving = false,
   shareId = null,
   footer,
+  hideHeader = false,
+  hideShareCard = false,
+  hideStory = false,
 }: {
   itinerary: Itinerary
   editable?: boolean
@@ -163,6 +166,11 @@ export function ItineraryView({
   saving?: boolean
   shareId?: string | null
   footer?: React.ReactNode
+  // 공유 화면처럼 위에 별도 머리말(표지)을 두는 경우 제목 영역을 숨긴다.
+  hideHeader?: boolean
+  hideShareCard?: boolean
+  // 표지에서 이야기를 따로 보여 줄 때 아래 접힌 이야기는 숨긴다
+  hideStory?: boolean
 }) {
   const baseGroups = useMemo(
     () => itinerary.dayGroups ?? itinerary.days.map((d) => d.stops.map((s) => s.id)),
@@ -238,9 +246,9 @@ export function ItineraryView({
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <header className={cn("flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between", hideHeader && "hidden")}>
         <div className="flex flex-col gap-2">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">My Itinerary</p>
+          <p className="text-[12px] uppercase tracking-[0.28em] text-muted-foreground">My Itinerary</p>
           <h1 className="text-balance font-serif text-3xl text-foreground">{itinerary.title}</h1>
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
             {dateRange && <span className="text-foreground">{dateRange}</span>}
@@ -267,7 +275,7 @@ export function ItineraryView({
             )}
           </p>
           {itinerary.estimated && !dirty && (
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[12px] text-muted-foreground">
               도로망 서버가 응답하지 않아 일부 거리·시간은 직선거리로 추정했어요.
             </p>
           )}
@@ -371,7 +379,7 @@ export function ItineraryView({
               <section key={d.day} aria-label={`${d.day}일 차`} className="flex flex-col gap-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[11px] uppercase tracking-[0.28em]" style={{ color }}>{`Day ${d.day}`}</span>
+                    <span className="text-[12px] uppercase tracking-[0.28em]" style={{ color }}>{`Day ${d.day}`}</span>
                     {d.date && <span className="font-serif text-lg">{formatDate(d.date, d.weekday)}</span>}
                     <WeatherChip day={d} />
                   </div>
@@ -442,9 +450,9 @@ export function ItineraryView({
           })}
       </div>
 
-      {itinerary.story && (
+      {itinerary.story && !hideStory && (
         <section className="flex flex-col gap-3 border-t border-border pt-6">
-          <h2 className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">여행 이야기</h2>
+          <h2 className="text-[12px] uppercase tracking-[0.04em] text-muted-foreground">여행 이야기</h2>
           <p className={cn("whitespace-pre-line text-sm leading-relaxed text-foreground/85", !storyOpen && "line-clamp-4")}>
             {itinerary.story}
           </p>
@@ -454,7 +462,7 @@ export function ItineraryView({
         </section>
       )}
 
-      {shareUrl && <ShareCard url={shareUrl} title={itinerary.title} />}
+      {shareUrl && !hideShareCard && <ShareCard url={shareUrl} title={itinerary.title} />}
       {shareOpen && shareUrl && <ShareDialog url={shareUrl} title={itinerary.title} onClose={() => setShareOpen(false)} />}
       {footer}
     </div>

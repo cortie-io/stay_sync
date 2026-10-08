@@ -90,6 +90,10 @@ module.exports = {
     "recommendation.last": "현재 조건으로 추천할 수 있는 마지막 관광지입니다. 마음에 드는 관광지를 선택해주세요.",
     "recommendation.exhausted": "현재 지역과 테마에 맞는 관광지가 더 이상 없습니다.",
     "selection.undone": "직전에 선택한 관광지를 취소했습니다. 추천 목록에서 다시 선택해주세요.",
+    "selection.askMore": "관광지를 더 추천받으시겠어요?",
+    "selection.lastList": "{region}에서 추천할 수 있는 관광지는 방금 목록이 마지막이에요. 목록에서 더 고르시겠어요, 아니면 이대로 동선을 만들까요?",
+    "selection.allPicked": "{region}에서 추천할 수 있는 관광지를 모두 고르셨어요. 고른 {count}곳으로 동선을 만들까요?",
+    "recommendation.reshow": "{region}에서 새로 추천할 관광지는 더 없어요. 앞에서 보여드린 곳 중 아직 고르지 않은 {count}곳을 다시 보여드릴게요. 더 고르시거나, 이대로 충분하면 ‘이대로 동선 만들기’를 눌러주세요.",
     "selection.askMoreUnclear": "관광지를 더 추천받을지, 지금 선택을 마칠지 편하게 말씀해주세요.",
     "selection.readyForRoute": "{reply}\n\n선택한 관광지를 기준으로 최적 동선을 준비할게요.",
 

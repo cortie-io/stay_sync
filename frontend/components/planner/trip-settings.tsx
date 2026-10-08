@@ -2,7 +2,7 @@
 
 import { BedDouble, CalendarDays, MapPin, RotateCcw, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn, koTracking } from "@/lib/utils"
 import {
   COMPANIONS,
   DURATIONS,
@@ -169,7 +169,7 @@ function StartLocationField({
 }
 
 function FieldLabel({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn("text-[10px] uppercase tracking-[0.28em] text-muted-foreground", className)}>{children}</span>
+  return <span className={cn("text-[11px] uppercase tracking-[0.28em] text-muted-foreground", koTracking(children), className)}>{children}</span>
 }
 
 // 동행자 유형 — 한 번 더 누르면 선택을 푼다.

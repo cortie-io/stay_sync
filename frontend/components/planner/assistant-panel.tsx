@@ -115,8 +115,8 @@ function RecommendationCard({
         </span>
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate font-serif text-sm group-hover:text-accent">{item.name}</span>
-          <span className="truncate text-[11px] text-muted-foreground">{[item.region, item.tag, item.indoorOutdoor].filter(Boolean).join(" · ")}</span>
-          {item.description && <span className="line-clamp-1 text-[11px] text-muted-foreground">{item.description}</span>}
+          <span className="truncate text-[12px] text-muted-foreground">{[item.region, item.tag, item.indoorOutdoor].filter(Boolean).join(" · ")}</span>
+          {item.description && <span className="line-clamp-1 text-[12px] text-muted-foreground">{item.description}</span>}
         </span>
       </button>
       <button
@@ -124,7 +124,7 @@ function RecommendationCard({
         onClick={onToggle}
         aria-label={added ? `${item.name} 빼기` : `${item.name} 담기`}
         className={cn(
-          "inline-flex h-7 shrink-0 items-center gap-1 rounded-full border px-2.5 text-[11px] transition-colors",
+          "inline-flex h-7 shrink-0 items-center gap-1 rounded-full border px-2.5 text-[12px] transition-colors",
           added ? "border-accent bg-accent text-accent-foreground" : "border-input hover:border-foreground",
         )}
       >
@@ -183,7 +183,7 @@ export function AssistantPanel({
       <header className="flex items-center justify-between border-b border-border px-6 py-4">
         <div className="flex flex-col gap-0.5">
           <h2 className="font-serif text-base text-foreground">AI 여행 컨시어지</h2>
-          <p className="flex items-center gap-1.5 text-[11px] tracking-wide text-muted-foreground">
+          <p className="flex items-center gap-1.5 text-[12px] tracking-wide text-muted-foreground">
             <span className={cn("size-1.5 rounded-full bg-accent", working && "animate-pulse")} aria-hidden />
             {working ? busyLabel || "답변을 준비하고 있습니다" : "담은 곳과 기간을 알고 있어요"}
           </p>
@@ -209,7 +209,7 @@ export function AssistantPanel({
           {assistant.messages.length === 0 && (
             <div className="flex flex-col gap-8 pt-2">
               <div className="flex flex-col gap-3">
-                <span className="text-[10px] uppercase tracking-[0.28em] text-accent">Concierge</span>
+                <span className="text-[11px] uppercase tracking-[0.28em] text-accent">Concierge</span>
                 <p className="text-balance font-serif text-2xl leading-snug text-foreground">어디로 떠나볼까요?</p>
                 <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
                   누구와, 어떤 여행을 원하는지 말씀해 주세요. 경기북부 인기 여행지를 골라 드리고, 담은 곳으로 날짜별 동선까지 짜 드려요.
@@ -235,7 +235,7 @@ export function AssistantPanel({
               </div>
             ) : (
               <div key={m.id} className="flex flex-col gap-2">
-                <span className="text-[10px] uppercase tracking-[0.28em] text-accent">Concierge</span>
+                <span className="text-[11px] uppercase tracking-[0.28em] text-accent">Concierge</span>
                 <div className={cn("text-sm", m.isError && "text-destructive")}>
                   <MessageText text={m.text} />
                 </div>

@@ -86,7 +86,7 @@ export function DestinationDrawer({
 
         <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-6">
           <div className="flex flex-col gap-2">
-            <span className="text-[10px] uppercase tracking-[0.28em] text-accent">
+            <span className="text-[11px] uppercase tracking-[0.04em] text-accent">
               {[destination.region, destination.tag].filter(Boolean).join(" · ")}
             </span>
             <h2 className="font-serif text-3xl leading-tight">{destination.name}</h2>
@@ -142,7 +142,7 @@ export function DestinationDrawer({
 
           {info && info.nearby.length > 0 && (
             <div className="flex flex-col gap-3">
-              <h3 className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">가까이 함께 가기 좋은 곳</h3>
+              <h3 className="text-[11px] uppercase tracking-[0.04em] text-muted-foreground">가까이 함께 가기 좋은 곳</h3>
               <ul className="border-t border-border">
                 {info.nearby.slice(0, 5).map((n) => {
                   const nearbyDestination: Destination = {
@@ -163,7 +163,7 @@ export function DestinationDrawer({
                         </span>
                         <span className="flex min-w-0 flex-col">
                           <span className="truncate text-sm hover:text-accent">{n.title}</span>
-                          <span className="text-[11px] text-muted-foreground">{`${n.type ?? "관광지"} · ${n.distanceKm}km`}</span>
+                          <span className="text-[12px] text-muted-foreground">{`${n.type ?? "관광지"} · ${n.distanceKm}km`}</span>
                         </span>
                       </button>
                       <button
@@ -180,7 +180,7 @@ export function DestinationDrawer({
               </ul>
             </div>
           )}
-          <p className="text-[11px] text-muted-foreground">정보 출처 · 한국관광공사 TourAPI</p>
+          <p className="text-[12px] text-muted-foreground">정보 출처 · 한국관광공사 TourAPI</p>
         </div>
 
         <div className="shrink-0 border-t border-border p-4">

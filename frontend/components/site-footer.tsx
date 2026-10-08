@@ -1,3 +1,4 @@
+import { cn, koTracking } from "@/lib/utils"
 import Link from "next/link"
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react"
 import { LogoMark } from "@/components/site-header"
@@ -19,7 +20,7 @@ const policyLinks = [
 ]
 
 function ColumnTitle({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground">{children}</p>
+  return <p className={cn("text-[12px] uppercase tracking-[0.3em] text-muted-foreground", koTracking(children))}>{children}</p>
 }
 
 // 서비스 소개·바로가기·지역·연락처 + 경복대학교 앵커사업단 · AI 디지털트윈연구원 운영 정보

@@ -431,7 +431,7 @@ export function PlannerApp() {
           <div className="flex flex-col gap-5">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="flex flex-col gap-2">
-                <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+                <p className="text-[12px] uppercase tracking-[0.28em] text-muted-foreground">
                   Trip Planner · Gyeonggi North
                 </p>
                 <h1 className="text-balance font-serif text-3xl text-foreground">

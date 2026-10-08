@@ -10,8 +10,15 @@ function formatDate(date) {
     return `${yyyy}-${mm}-${dd}`;
 }
 
+// 한국 시간 기준 '지금'. 서버가 UTC로 돌아도 자정~오전 9시에 '오늘·내일'이 하루 앞당겨지지 않게,
+// 한국 벽시계와 같은 날짜·시각을 가진 Date를 돌려준다(getDate()/getDay() 등으로 읽는다).
+function koreaNow() {
+    const now = new Date();
+    return new Date(now.getTime() + (9 * 60 + now.getTimezoneOffset()) * 60 * 1000);
+}
+
 function getToday() {
-    return formatDate(new Date());
+    return formatDate(koreaNow());
 }
 
 function isOneDayTrip(startDate, endDate) {
@@ -57,6 +64,7 @@ function shiftPastDateToNextYear(date, now = new Date()) {
 module.exports = {
     formatDate,
     getToday,
+    koreaNow,
     isOneDayTrip,
     parseDate,
     startOfDay,

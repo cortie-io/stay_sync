@@ -31,7 +31,7 @@ export function PlanBar({
     <section aria-labelledby="plan-bar-title" className="flex shrink-0 flex-col overflow-hidden rounded-sm border border-border bg-card sm:flex-row">
       <div className="flex min-w-0 flex-1 flex-col gap-4 p-5 sm:p-6">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 id="plan-bar-title" className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+          <h2 id="plan-bar-title" className="text-[12px] uppercase tracking-[0.04em] text-muted-foreground">
             담은 곳 · Your Picks
           </h2>
           {!empty && (

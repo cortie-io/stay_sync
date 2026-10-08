@@ -83,7 +83,7 @@ export function TopPicksCard({ eyebrow, title, picks }: { eyebrow: string; title
               <div className="flex flex-col gap-0.5 md:flex-row md:items-baseline md:gap-2">
                 <span className="font-serif text-xs text-accent md:text-sm">{pad2(p.rank)}</span>
                 <span className="line-clamp-2 min-w-0 font-serif text-sm leading-snug md:truncate md:text-lg">{p.name}</span>
-                {p.sub && <span className="text-[11px] text-muted-foreground md:ml-auto md:shrink-0 md:text-xs">{p.sub}</span>}
+                {p.sub && <span className="text-[12px] text-muted-foreground md:ml-auto md:shrink-0 md:text-xs">{p.sub}</span>}
               </div>
             </>
           )

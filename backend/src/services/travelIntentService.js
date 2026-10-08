@@ -4,11 +4,18 @@ const {
     formatDate,
     getToday,
     isOneDayTrip,
+    koreaNow,
     parseDate,
     startOfDay,
     addYears,
     shiftPastDateToNextYear,
 } = require("../utils/dateUtils");
+const {
+    normalizeDateText,
+    parseDuration,
+    findRelativeDates,
+    parseCalendarPeriod,
+} = require("./dateExpressionService");
 const { CURRENT_STEP, ROUTE_NUMBER, SERVICE_TYPE } = require("../data/constants");
 const { resolveHolidayPeriod } = require("./holidayService");
 const { t, regionLabel } = require("./messageService");
@@ -17,28 +24,6 @@ function addDays(date, days) {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
-}
-
-// 영어로 쓴 수량 표현. 'two days'처럼 숫자 없이 말하는 경우를 위해 둔다.
-const ENGLISH_NUMBER_WORDS = {
-    a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5,
-    six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-};
-
-function parseEnglishDuration(text) {
-    const nightMatch = text.match(/(\d+)\s*nights?\s*(?:and\s*)?(\d+)\s*days?/i);
-    if (nightMatch) return Number.parseInt(nightMatch[2], 10);
-
-    const nightsOnly = text.match(/(\d+)\s*nights?/i);
-    if (nightsOnly) return Number.parseInt(nightsOnly[1], 10) + 1;
-
-    const dayMatch = text.match(/(\d+)\s*days?/i);
-    if (dayMatch) return Number.parseInt(dayMatch[1], 10);
-
-    const wordMatch = text.match(/\b(a|an|one|two|three|four|five|six|seven|eight|nine|ten)\s+days?\b/i);
-    if (wordMatch) return ENGLISH_NUMBER_WORDS[wordMatch[1].toLowerCase()];
-
-    return null;
 }
 
 const ENGLISH_MONTHS = {
@@ -87,6 +72,7 @@ function findExplicitDates(text) {
             const rawMonth = match[monthGroup];
             found.push({
                 index: match.index,
+                length: match[0].length,
                 year: match[yearGroup] ? Number(match[yearGroup]) : null,
                 month: Number.isNaN(Number(rawMonth))
                     ? ENGLISH_MONTHS[String(rawMonth).slice(0, 3).toLowerCase()]
@@ -103,7 +89,7 @@ function findExplicitDates(text) {
     for (const match of value.matchAll(dayOnly)) {
         const numberIndex = match.index + match[0].indexOf(match[1]);
         if (spans.some(([start, end]) => numberIndex >= start && numberIndex < end)) continue;
-        found.push({ index: numberIndex, year: null, month: null, day: Number(match[1]) });
+        found.push({ index: numberIndex, length: match[0].length - (numberIndex - match.index), year: null, month: null, day: Number(match[1]) });
     }
 
     return found
@@ -117,7 +103,7 @@ function findExplicitDates(text) {
  * 연도를 말하지 않았고 오늘보다 이른 날짜면 내년으로 읽는다.
  * 9월에 '6월 5일'이라고 하면 지난 6월일 리가 없다.
  */
-function parseExplicitPeriod(userMessage, now = new Date()) {
+function parseExplicitPeriod(userMessage, now = koreaNow()) {
     const dates = findExplicitDates(userMessage);
     if (dates.length === 0) return null;
 
@@ -160,50 +146,21 @@ function parseExplicitPeriod(userMessage, now = new Date()) {
     };
 }
 
-const KOREAN_DURATIONS = [
-    ["열흘", 10], ["아흐레", 9], ["여드레", 8], ["이레", 7], ["엿새", 6],
-    ["닷새", 5], ["나흘", 4], ["사흘", 3], ["이틀", 2], ["하루", 1],
-];
+// 달을 말한 날짜('6월 5일')를 하나씩 실제 날짜로 푼다. 요일·주말 계산의 기준점이 된다.
+function resolveExplicitDates(userMessage, now) {
+    const spokenYear = findSpokenYear(userMessage);
+    const relativeYearOffset = findRelativeYearOffset(userMessage);
+    const statedYear = spokenYear
+        ?? (relativeYearOffset === null ? null : now.getFullYear() + relativeYearOffset);
 
-// '2박3일', '3일간', 'two days'처럼 말한 일수를 읽는다.
-function parseDuration(userMessage) {
-    const original = String(userMessage || "");
-    const text = original.replace(/\s/g, "");
-
-    const nightMatch = text.match(/(\d+)박(?:\s*)(\d+)일/);
-    if (nightMatch) return Number.parseInt(nightMatch[2], 10);
-
-    const dayMatch = text.match(/(\d+)일(?:동안|간)/);
-    if (dayMatch) return Number.parseInt(dayMatch[1], 10);
-
-    const koreanDuration = KOREAN_DURATIONS.find(([word]) => text.includes(word));
-    if (koreanDuration) return koreanDuration[1];
-
-    return parseEnglishDuration(original);
-}
-
-function findRelativeDates(text) {
-    const value = String(text || "");
-    const found = [];
-
-    for (const match of value.matchAll(/오늘|내일|모레/g)) {
-        found.push({
-            index: match.index,
-            length: match[0].length,
-            offset: match[0] === "오늘" ? 0 : match[0] === "내일" ? 1 : 2,
-        });
-    }
-
-    for (const match of value.matchAll(/\b(day\s+after\s+tomorrow|tomorrow|today)\b/gi)) {
-        const word = match[0].toLowerCase().replace(/\s+/g, " ");
-        found.push({
-            index: match.index,
-            length: match[0].length,
-            offset: word === "today" ? 0 : word === "tomorrow" ? 1 : 2,
-        });
-    }
-
-    return found.sort((left, right) => left.index - right.index);
+    return findExplicitDates(userMessage)
+        .filter(({ month }) => month !== null)
+        .map(({ index, length, year, month, day }) => {
+            const date = parseDate(`${year ?? statedYear ?? now.getFullYear()}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
+            if (!date) return null;
+            return { index, length, start: year || statedYear ? date : shiftPastDateToNextYear(date, now) };
+        })
+        .filter(Boolean);
 }
 
 function hasUntilMarker(text) {
@@ -222,8 +179,9 @@ function partialPeriod({ startDate = null, endDate = null }) {
     };
 }
 
-function parseSimplePeriod(userMessage, now = new Date()) {
-    const original = String(userMessage || "");
+function parseSimplePeriod(userMessage, now = koreaNow()) {
+    // '시월 삼일', '10.3-10.5' 같은 표기를 먼저 맞춘다('10월 삼일'을 삼일절로 읽지 않게).
+    const original = normalizeDateText(userMessage);
     const text = original.replace(/\s/g, "");
 
     // '개천절 연휴'처럼 공휴일 이름으로 말한 기간을 먼저 본다.
@@ -236,9 +194,13 @@ function parseSimplePeriod(userMessage, now = new Date()) {
         const { holiday, ...period } = holidayPeriod;
         return period;
     }
+
+    // 요일·주말·며칠 뒤·달 없는 며칠 같은 말은 날짜 온톨로지로 푼다.
+    const calendarPeriod = parseCalendarPeriod(original, now, resolveExplicitDates(original, now));
+    if (calendarPeriod) return calendarPeriod;
     const relativeDates = findRelativeDates(original);
     if (relativeDates.length === 0) {
-        const explicitPeriod = parseExplicitPeriod(userMessage, now);
+        const explicitPeriod = parseExplicitPeriod(original, now);
         if (!explicitPeriod) return null;
 
         // '~까지'는 종료일만, '~부터'는 시작일만 답한 것이다.
@@ -267,7 +229,7 @@ function parseSimplePeriod(userMessage, now = new Date()) {
     }
 
     const aroundDate = `${original.slice(0, firstRelative.index)} ${original.slice(firstRelative.index + firstRelative.length)}`;
-    const duration = parseDuration(userMessage);
+    const duration = parseDuration(original);
     if (hasUntilMarker(aroundDate) && !hasFromMarker(aroundDate)) {
         return partialPeriod({ endDate: firstDate });
     }
@@ -306,7 +268,7 @@ function parseSimplePeriod(userMessage, now = new Date()) {
  * 연도를 빼고 말하면 LLM이 올해로 채워 지난 날짜를 돌려줄 때가 있다.
  * 여행 날짜가 어제일 수는 없으므로 내년으로 읽는다.
  */
-function normalizePastDates(facts = {}, now = new Date()) {
+function normalizePastDates(facts = {}, now = koreaNow()) {
     const start = parseDate(facts.start_date);
     const end = parseDate(facts.end_date);
     if (!start) return facts;
